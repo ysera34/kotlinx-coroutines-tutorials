@@ -126,25 +126,6 @@ class LaunchCoroutineTest {
         }
     }
 
-    @Test
-    fun launchTest9() {
-        runBlocking {
-            val time = measureTimeMillis {
-                val task = GlobalScope.launch {
-                    delay(2000)
-                    println("Task Completed")
-                }
-                // Wait for it to complete once
-                task.join()
-
-                // Restart the Job
-                task.start()
-                task.join()
-            }
-            println("Took $time ms")
-        }
-    }
-
     private fun doSomeThing() {
         throw UnsupportedOperationException("Can't do")
     }
