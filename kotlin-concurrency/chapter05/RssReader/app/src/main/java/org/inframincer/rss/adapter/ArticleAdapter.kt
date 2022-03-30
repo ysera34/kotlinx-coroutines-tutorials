@@ -5,11 +5,16 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.inframincer.rss.R
 import org.inframincer.rss.model.Article
 
-class ArticleAdapter : RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
-    val articles = mutableListOf<Article>()
+class ArticleAdapter(
+    private val loader: ArticleLoader,
+) : RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
+    private val articles = mutableListOf<Article>()
+    private var loading = false
 
     class ViewHolder(
         val layout: LinearLayout,
@@ -30,6 +35,15 @@ class ArticleAdapter : RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val article = articles[position]
+
+        if (!loading && position >= articles.size - 2) {
+            loading = true
+
+            GlobalScope.launch {
+                loader.loadArticles()
+                loading = false
+            }
+        }
 
         holder.feed.text = article.feed
         holder.title.text = article.title
