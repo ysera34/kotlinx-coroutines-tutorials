@@ -10,9 +10,7 @@ import kotlinx.coroutines.launch
 import org.inframincer.rss.R
 import org.inframincer.rss.model.Article
 
-class ArticleAdapter(
-    private val loader: ArticleLoader,
-) : RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
+class ArticleAdapter : RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
     private val articles = mutableListOf<Article>()
     private var loading = false
 
@@ -36,15 +34,6 @@ class ArticleAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val article = articles[position]
 
-        if (!loading && position >= articles.size - 2) {
-            loading = true
-
-            GlobalScope.launch {
-                loader.loadArticles()
-                loading = false
-            }
-        }
-
         holder.feed.text = article.feed
         holder.title.text = article.title
         holder.summary.text = article.summary
@@ -54,8 +43,18 @@ class ArticleAdapter(
         return articles.size
     }
 
+    fun add(article: Article) {
+        this.articles.add(article)
+        notifyDataSetChanged()
+    }
+
     fun addAll(articles: List<Article>) {
         this.articles.addAll(articles)
+        notifyDataSetChanged()
+    }
+
+    fun clear() {
+        this.articles.clear()
         notifyDataSetChanged()
     }
 }

@@ -1,9 +1,9 @@
 package org.inframincer.rss
 
 import android.os.Bundle
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.Toast
+import android.provider.Contacts
+import android.widget.Button
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -11,18 +11,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.inframincer.rss.adapter.ArticleAdapter
-import org.inframincer.rss.adapter.ArticleLoader
-import org.inframincer.rss.producer.ArticleProducer
+import org.inframincer.rss.search.Searcher
+import kotlin.coroutines.CoroutineContext
 
-class MainActivity : AppCompatActivity(), ArticleLoader {
+class SearchActivity : AppCompatActivity() {
 
     private lateinit var articlesRecyclerView: RecyclerView
     private lateinit var viewManager: RecyclerView.LayoutManager
     private lateinit var viewAdapter: ArticleAdapter
+    private val searcher = Searcher()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_search)
 
         viewManager = LinearLayoutManager(this)
         viewAdapter = ArticleAdapter()
@@ -31,21 +32,23 @@ class MainActivity : AppCompatActivity(), ArticleLoader {
             adapter = viewAdapter
         }
 
-        GlobalScope.launch {
-            loadArticles()
+        findViewById<Button>(R.id.searchButton).setOnClickListener {
+            viewAdapter.clear()
+            GlobalScope.launch {
+                search()
+            }
         }
     }
 
-    override suspend fun loadArticles() {
-        val producer = ArticleProducer.producer
+    private suspend fun search() {
+        val query = findViewById<EditText>(R.id.searchText).text.toString()
+        val channel = searcher.search(query)
 
-        if (!producer.isClosedForReceive) {
-            val articles = producer.receive()
+        while (!channel.isClosedForReceive) {
+            val article = channel.receive()
 
             GlobalScope.launch(Dispatchers.Main) {
-                Toast.makeText(this@MainActivity, "loadArticles()", Toast.LENGTH_SHORT).show()
-                findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE
-                viewAdapter.addAll(articles)
+                viewAdapter.add(article)
             }
         }
     }
