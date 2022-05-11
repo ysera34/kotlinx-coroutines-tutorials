@@ -7,7 +7,7 @@
     tools:context=".SearchActivity">
 
     <EditText
-        android:id="@+id/searchText"
+        android:id="@+id/searchEditText"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent" />
@@ -17,13 +17,19 @@
         android:text="Search"
         android:layout_width="80dp"
         android:layout_height="50dp"
-        app:layout_constraintLeft_toRightOf="@id/searchText" />
+        app:layout_constraintLeft_toRightOf="@id/searchEditText" />
+
+    <TextView
+        android:id="@+id/resultsTextView"
+        app:layout_constraintTop_toBottomOf="@id/searchEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/articles"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@id/searchText" />
+        app:layout_constraintTop_toBottomOf="@id/resultsTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
