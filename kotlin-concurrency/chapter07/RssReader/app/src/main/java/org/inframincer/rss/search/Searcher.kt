@@ -47,8 +47,8 @@ class Searcher {
             .map { it as Element }
             .filter { "item" == it.tagName }
             .forEach {
-                val title = it.getElementsByTagName("title").item(0).textContent
-                var summary = it.getElementsByTagName("description").item(0).textContent
+                val title = it.getElementsByTagName("title")?.item(0)?.textContent ?: ""
+                var summary = it.getElementsByTagName("description")?.item(0)?.textContent ?: ""
 
                 if (title.contains(query) || summary.contains(query)) {
                     if (summary.contains("<div")) {
@@ -57,6 +57,8 @@ class Searcher {
 
                     val article = Article(feed.name, title, summary)
                     channel.send(article)
+
+                    ResultsCounter.increment()
                 }
             }
     }
